@@ -1,0 +1,76 @@
+.monopoly-property {
+    width: 120px;
+    height: 150px;
+    border: 2px solid black;
+}
+
+.monopoly-property-header {
+    height: 30px;
+    border-bottom: 2px solid black;
+}
+
+.monopoly-property-name {
+    text-align: center;
+    font-family: sans-serif;
+}
+
+.corner-square {
+    width: 150px;
+    height: 150px;
+    border: 2px solid black;
+}
+
+.column {
+    width: 154px;
+    margin-bottom: -15px;
+}
+
+div.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.top-property {
+    transform: rotateZ(180deg);
+}
+
+.left-property {
+    transform: rotateZ(90deg) translateY(-15px);
+    margin-top: -30px
+}
+
+.left-property:first-of-type {
+    margin-top: -15px
+}
+
+.right-property {
+    transform: rotateZ(270deg) translateY(15px);
+    margin-top: -30px
+}
+
+.right-property:first-of-type {
+    margin-top: -15px
+}
+
+.center {
+    min-width: 992px;
+    width: 992px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.menu {
+    position: fixed;
+    width: 30vw;
+    height: 100vh;
+    left: -5000px;
+    top: 0px;
+    z-index: 1000;
+    background-color: white;
+    border-right: 15px solid steelblue;
+    box-shadow: 10px 10px 31px 6px rgba(0,0,0,0.49);
+    -webkit-box-shadow: 10px 10px 31px 6px rgba(0,0,0,0.49);
+    -moz-box-shadow: 10px 10px 31px 6px rgba(0,0,0,0.49);
+}
