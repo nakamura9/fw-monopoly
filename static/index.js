@@ -311,4 +311,98 @@ $(document).ready(() => {
     })
 
 
+    $('.modal-content').append(`
+        <h2>Welcome</h2>
+        <p>Please choose an option to get started:</p>
+        <ol>
+            <li><input type="radio" name="game_type" value="continue" checked /> Continue an existing game</li>
+            <li><input type="radio" name="game_type" value="new" /> Start a new game</li>
+        </ul> 
+        <button class="btn btn-primary" id ="select_btn"> Go! </button>
+    `)
+
+    $("#select_btn").click(() => {
+        const game_type = $("input[name='game_type']:checked").val()
+        console.log(game_type)
+        if(game_type == "new") {
+            renderNewGame()
+        } else {
+            renderContinueGame()
+        }
+    })
+
 })
+
+const renderNewGame = () => {
+    $('.modal-content').empty()
+    $('.modal-content').append(`
+        <h2>New Game</h2>
+        <p>Please enter the number of players and their names below:</p>
+        <div class="form-group">
+            <label>Number of players:</label>
+            <input type="number" id="num_players"/>
+        </div>
+        <div class="form-group">
+            <label>Player 1:</label>
+            <input type="text" id="player_one"/>
+        </div>
+        <div class="form-group">
+            <label>Player 2:</label>
+            <input type="text" id="player_two"/>
+        </div>
+        <div class="form-group">
+            <label>Player 3:</label>
+            <input type="text" id="player_three"/>
+        </div>
+        <div class="form-group">
+            <label>Player 4:</label>
+            <input type="text" id="player_four"/>
+        </div>
+        <button class="btn btn-primary" id ="start_game_btn"> Create Game! </button>
+    `)
+    $("#start_game_btn").click(handleNewGame)
+}
+
+const handleNewGame = () => {
+    console.log('new game')
+    $.ajax({
+        method: 'POST',
+        url: '/new-game/',
+        data: {
+            num_players: $("#num_players").val(),
+            player_one: $("#player_one").val(),
+            player_two: $("#player_two").val(),
+            player_three: $("#player_three").val(),
+            player_four: $("#player_four").val(),
+        }
+    }).then(res => {
+        console.log(res)
+    })
+}
+
+const handleContinueGame = () => {
+    console.log('continue game')
+    $.ajax({
+        method: 'POST',
+        url: '/continue-game/',
+        data: {
+            game_id: $("#game_id").val()
+        }
+    }).then(res => {
+        console.log(res)
+    })
+}
+
+const renderContinueGame = () => {
+    $('.modal-content').empty()
+    $('.modal-content').append(`
+        <h2>Resume Game</h2>
+        <p>Please game ID you want to resume/join:</p>
+        <div>
+            <label>Game ID:</label>
+            <input type="number" id="game_id"/>
+        </div>
+        <button class="btn btn-primary" id ="continue_game_btn"> Continue Game </button>
+    `)
+    $("#continue_game_btn").click(handleContinueGame)
+}

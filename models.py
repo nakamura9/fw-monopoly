@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import relationship
-from .db import Base
+from db import Base
 
 
 
@@ -27,6 +27,3 @@ class Player(Base):
     jail_turns = Column(Integer)
     complete_tours = Column(Integer)
     
-
-
-Base.metadata.create_all(engine)
