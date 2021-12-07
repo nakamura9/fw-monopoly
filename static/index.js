@@ -1,6 +1,14 @@
-$(document).ready(() => {
+const localStorage = window.localStorage
 
+$(document).ready(() => {
+    const socket = io()
+    socket.on('connect', () => {
+        socket.emit('my event', {data: 'I am connected'})
+    })
     
+    $(".menu-button").click(showMenu)
+    $(".close-menu-button").click(hideMenu)
+
     const topCells = [
         {
             label: 'Inn',
@@ -259,9 +267,8 @@ $(document).ready(() => {
     
     const renderCell = (cell, container, orientation) => {
         if(cell.type == 'city') {
-            console.log(cell)
             $(container).append(`
-                <div class="monopoly-property ${orientation}">
+                <div class="monopoly-property ${orientation}" data-cell_id=${cell.id}>
                     <div class='monopoly-property-header' style="background-color: ${cell.color};"></div>
                     <div>
                         <h4 class='monopoly-property-name'>${cell.label}</h4>
@@ -310,7 +317,7 @@ $(document).ready(() => {
         renderCell(cell, '.cells-bottom', '')
     })
 
-
+    /*
     $('.modal-content').append(`
         <h2>Welcome</h2>
         <p>Please choose an option to get started:</p>
@@ -323,15 +330,17 @@ $(document).ready(() => {
 
     $("#select_btn").click(() => {
         const game_type = $("input[name='game_type']:checked").val()
-        console.log(game_type)
         if(game_type == "new") {
             renderNewGame()
         } else {
             renderContinueGame()
         }
     })
-
+*/
+hideModal()
 })
+
+
 
 const renderNewGame = () => {
     $('.modal-content').empty()
@@ -380,6 +389,22 @@ const handleNewGame = () => {
     })
 }
 
+const hideModal = () => {
+    $(".modal-background").hide()
+}
+
+const showModal = () => {
+    $(".modal-background").show()
+}
+
+const hideMenu = () => {
+    $(".menu").css('left', '-30vw')
+}
+
+const showMenu = () => {
+    $(".menu").css('left', '0px')
+}
+
 const handleContinueGame = () => {
     console.log('continue game')
     $.ajax({
@@ -390,6 +415,9 @@ const handleContinueGame = () => {
         }
     }).then(res => {
         console.log(res)
+        hideModal()
+        renderPositions(res.state.positions)
+        updateSidebar(res.state)
     })
 }
 
@@ -405,4 +433,16 @@ const renderContinueGame = () => {
         <button class="btn btn-primary" id ="continue_game_btn"> Continue Game </button>
     `)
     $("#continue_game_btn").click(handleContinueGame)
+}
+
+const renderPositions = (positions) => {
+
+}
+
+const updateSidebar = (state) => {
+
+}
+
+const rollDice = () => {
+    
 }

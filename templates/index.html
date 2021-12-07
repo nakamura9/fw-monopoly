@@ -2,10 +2,39 @@
     <head>
         <title>Theocratic monopoly</title>
         <link rel="stylesheet" href="static/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css
+        ">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
     </head>
     <body>
-        <div class="menu"></div>
+        <div class="menu">
+            <div class="menu-header">
+                <div class="h4">Game Menu</div>
+                <div class="close-menu-button">
+                    <i class="fas fa-angle-left fa-2x    "></i>
+                </div>
+            </div>
+            <h3>Current Player: <span id="current_player"></span></h3>
+            <hr>
+            <h4>Players</h4>
+                <ul id="player_list">
+                    
+                </ul>
+            <hr>
+            <div class="menu-actions">
+                <button disabled class="btn btn-primary">Roll Dice</button>
+                <button class="btn btn-primary"> End Turn </button>
+            </div>
+            <hr>
+            <div class="die">
+                <div class="dice-1"></div>
+                <div class="dice-2"></div>
+            </div>
+        </div>
+        <div class="menu-button">
+            <i class="fas fa-angle-right fa-2x    "></i>
+        </div>
         <div>
             <div class="row cells-top" >
             </div>

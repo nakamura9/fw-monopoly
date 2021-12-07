@@ -14,6 +14,7 @@ class Game(Base):
     c2 = Column(Integer) # letters from the governing body
     # use integers not primary keys, for iterating e.g. 0-3 
     current_player = Column(Integer)
+    current_player_index = Column(Integer)
 
 class Player(Base):
     __tablename__ = "player"
@@ -26,4 +27,5 @@ class Player(Base):
     scrolls = Column(Integer)
     jail_turns = Column(Integer)
     complete_tours = Column(Integer)
+    turn_ended = Column(Boolean, default=False)
     

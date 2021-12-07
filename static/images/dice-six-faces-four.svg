@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg2576"
+   sodipodi:docname="dice-six-faces-four.svg"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2580" />
+  <sodipodi:namedview
+     id="namedview2578"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="255.5"
+     inkscape:cy="256.5"
+     inkscape:window-width="1366"
+     inkscape:window-height="697"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2576" />
+  <path
+     d="M0 0h512v512H0z"
+     id="path2572" />
+  <path
+     fill="#fff"
+     d="M74.5 36A38.5 38.5 0 0 0 36 74.5v363A38.5 38.5 0 0 0 74.5 476h363a38.5 38.5 0 0 0 38.5-38.5v-363A38.5 38.5 0 0 0 437.5 36h-363zm48.97 36.03A50 50 0 0 1 172 122a50 50 0 0 1-100 0 50 50 0 0 1 51.47-49.97zm268 0A50 50 0 0 1 440 122a50 50 0 0 1-100 0 50 50 0 0 1 51.47-49.97zm-268 268A50 50 0 0 1 172 390a50 50 0 0 1-100 0 50 50 0 0 1 51.47-49.97zm268 0A50 50 0 0 1 440 390a50 50 0 0 1-100 0 50 50 0 0 1 51.47-49.97z"
+     id="path2574" />
+  <path
+     style="fill:#ffffff;stroke:#000000;stroke-width:5;stroke-opacity:0.819277"
+     d="M 0,256 V 0 H 256 512 V 256 512 H 256 0 Z m 454.48724,216.56038 c 7.62618,-3.74431 14.32883,-10.44696 18.07314,-18.07314 L 475.5,448.5 V 256 63.5 l -2.93962,-5.987237 C 468.81607,49.886579 462.11342,43.183928 454.48724,39.439618 L 448.5,36.5 H 256 63.5 l -5.987237,2.939618 C 49.886579,43.183928 43.183928,49.886579 39.439618,57.512763 L 36.5,63.5 36.239803,253.95901 c -0.225853,165.31989 -0.06577,191.12781 1.212808,195.52597 3.112498,10.70662 13.898931,21.69894 24.516191,24.98415 3.829151,1.18482 34.124038,1.37329 195.531198,1.21646 L 448.5,475.5 Z"
+     id="path2619" />
+</svg>
