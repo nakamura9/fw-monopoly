@@ -1,4 +1,12 @@
-const localStorage = window.localStorage
+const store = window.localStorage
+
+const colors = [
+    "crimson",
+    "limegreen",
+    "steelblue",
+    "#007bff"
+]
+
 
 $(document).ready(() => {
     const socket = io()
@@ -9,298 +17,85 @@ $(document).ready(() => {
     $(".menu-button").click(showMenu)
     $(".close-menu-button").click(hideMenu)
 
-    const topCells = [
-        {
-            label: 'Inn',
-            icon: null,
-            id: 19,
-            type: 'corner'
-        },
-        {
-            label: 'Jerusalem',
-            icon: null,
-            id: 20,
-            type: 'city',
-            color: 'red'
-        },
-        {
-            label: 'Ephesus',
-            icon: null,
-            id: 21,
-            type: 'city',
-            color: 'red'
-        },
-        {
-            label: 'Antioch',
-            icon: null,
-            id: 22,
-            type: 'city',
-            color: 'red'
+    renderBoard()
+    onPageLoad()
+    registerEventHandlers()
+    // renderMessage([
+    //     {label: "Caleb Is great", content:"Fo sho"},
+    //     {label: "Conrad Is lame", content:"Mzanzi"},
+    // ])
+})
 
-        },
-        {
-            label: 'Time and unforeseen occurence',
-            icon: null,
-            id: 23,
-            type: 'times'
-        },
-        {
-            label: 'Phillipi',
-            icon: null,
-            id: 24,
-            type: 'city',
-            color: 'yellow'
-        },
-        {
-            label: 'Alexandria',
-            icon: null,
-            id: 25,
-            type: 'city',
-            color: 'yellow'
-        },
-        {
-            label: 'Athens',
-            icon: null,
-            id: 26,
-            type: 'city',
-            color: 'yellow'
-        },
-        
-        {
-            label: 'Jerusalem Synagogue',
-            icon: null,
-            id: 27,
-            type: 'synagogue'
-        },
-        {
-            label: 'Go To Jail',
-            icon: null,
-            id: 28,
-            type: 'corner'
-        },
-    ]
 
-    const rightCells = [
-        {
-            label: 'Derbe',
-            icon: null,
-            id: 29,
-            type: 'city',
-            color: 'green'
-        },
-        {
-            label: 'Letters from the Governing Body',
-            icon: null,
-            id: 30,
-            type: 'letters'
-        },
-        {
-            label: 'Lystra',
-            icon: null,
-            id: 31,
-            type: 'city',
-            color: 'green'
-        },
-        {
-            label: 'Iconium',
-            icon: null,
-            id: 32,
-            type: 'city',
-            color: 'green'
-
-        },
-        {
-            label: 'The one Scroll Tax',
-            icon: null,
-            id: 33,
-            type: 'taxes'
-        },
-        {
-            label: 'Colossae',
-            icon: null,
-            id: 34,
-            type: 'city',
-            color: 'royalblue'
-        },
-        {
-            label: 'Roman Synagogue',
-            icon: null,
-            id: 35,
-            type: 'synagogue'
-        },
-        {
-            label: 'Laodicea',
-            icon: null,
-            id: 36,
-            type: 'city',
-            color: 'royalblue'
-        },
-    ]
-    const leftCells = [
-        {
-            label: 'Corinth',
-            icon: null,
-            id: 18,
-            type: 'city',
-            color: 'orange'
-        },
-        {
-            label: 'Beroea',
-            icon: null,
-            id: 17,
-            type: 'city',
-            color: 'orange'
-        },
-        {
-            label: 'Caesarea',
-            icon: null,
-            id: 16,
-            type: 'city',
-            color: 'orange'
-
-        },
-        {
-            label: 'Letters from the Governing Body',
-            icon: null,
-            id: 15,
-            type: 'letters'
-        },
-        {
-            label: 'Damascus',
-            icon: null,
-            id: 14,
-            type: 'city',
-            color: '#7D0552'
-        },
-        {
-            label: 'Phillipi Synagogue',
-            icon: null,
-            id: 13,
-            type: 'synagogue'
-        },
-        {
-            label: 'Pella',
-            icon: null,
-            id: 12,
-            type: 'city',
-            color: '#7D0552'
-        },
-        {
-            label: 'Troas',
-            icon: null,
-            id: 11,
-            type: 'city',
-            color: '#7D0552'
-        },
-        
-    ]
-
-    const bottomCells = [
-        {
-            label: 'Jail',
-            icon: null,
-            id: 10,
-            type: 'corner'
-        },
-        {
-            label: 'Thyatira',
-            icon: null,
-            id: 9,
-            type: 'city',
-            color: 'skyblue'
-        },
-        {
-            label: 'Tarsus',
-            icon: null,
-            id: 8,
-            type: 'city',
-            color: 'skyblue'
-        },
-        {
-            label: 'Antioch',
-            icon: null,
-            id: 7,
-            type: 'city',
-            color: 'skyblue'
-
-        },
-        {
-            label: 'Time and unforeseen occurence',
-            icon: null,
-            id: 6,
-            type: 'times'
-        },
-        {
-            label: 'Corintian Synagogue',
-            icon: null,
-            id: 5,
-            type: 'synagogue'
-        },
-        {
-            label: 'Syracuse',
-            icon: null,
-            id: 4,
-            type: 'city',
-            color: 'brown'
-        },
-        {
-            label: 'Letters from the Governing Body',
-            icon: null,
-            id: 3,
-            type: 'times'
-        },
-        
-        {
-            label: 'Salamis',
-            icon: null,
-            id: 2,
-            type: 'city',
-            color: 'brown'
-        },
-        {
-            label: 'Go',
-            icon: null,
-            id: 1,
-            type: 'corner'
-        },
-    ]
+const renderBoard = () => {
     
     const renderCell = (cell, container, orientation) => {
+        const prepend = [".cells-left", ".cells-bottom"].includes(container) 
         if(cell.type == 'city') {
-            $(container).append(`
+            const cityContent = `
                 <div class="monopoly-property ${orientation}" data-cell_id=${cell.id}>
                     <div class='monopoly-property-header' style="background-color: ${cell.color};"></div>
                     <div>
                         <h4 class='monopoly-property-name'>${cell.label}</h4>
+                        <div class="monopoly-property-tokens"></div>
                     </div>
                 </div>
-            `)
+            ` 
+            prepend ? $(container).prepend(cityContent) : $(container).append(cityContent)
         } else if (cell.type == "synagogue") {
-            $(container).append(`
-                <div class="monopoly-property ${orientation}">
+            const synagogueContent = `
+                <div class="monopoly-property ${orientation}" data-cell_id=${cell.id}>
                     <div>
                         <h4 class='monopoly-property-name'>${cell.label}</h4>
+                        <div class="monopoly-property-tokens"></div>
                     </div>
                 </div>
-            `)
+            `
+            prepend ? $(container).prepend(synagogueContent) : $(container).append(synagogueContent)
         } else if (cell.type == "corner") {
-            $(container).append(`
-                <div class="corner-square">
+            const cornerContent = `
+                <div class="corner-square" data-cell_id=${cell.id}>
                     <h2>${cell.label}</h2>
+                    <div class="monopoly-property-tokens"></div>
                 </div>
-            `)
+            `
+            prepend ? $(container).prepend(cornerContent) : $(container).append(cornerContent)
         } else if (["letters", 'times', 'taxes'].includes(cell.type )) {
-            $(container).append(`
-                <div class="monopoly-property ${orientation}">
+            const otherContent = `
+                <div class="monopoly-property ${orientation}" data-cell_id=${cell.id}>
                     <div>
                         <h4 class='monopoly-property-name'>${cell.label}</h4>
+                        <div class="monopoly-property-tokens"></div>
                     </div>
                 </div>
-            `)
+            `
+            prepend ? $(container).prepend(otherContent) : $(container).append(otherContent)
         }
  
-    } 
-    
+    }
+    $.ajax({
+        method: "GET",
+        url: "/get-cells/",
+    }).then(res => {
+        console.log(res)
+        res.cells.forEach(cell => {
+            switch(cell.direction) {
+                case "N":
+                    renderCell(cell, '.cells-top', 'top-property')
+                    break;
+                case "S":
+                    renderCell(cell, '.cells-bottom', '')
+                    break;
+                case "W":
+                    renderCell(cell, '.cells-left', 'left-property')
+                    break;
+                case "E":
+                    renderCell(cell, '.cells-right', 'right-property')
+                    break;
+            }
+        })
+    }) 
+    /*
     topCells.forEach(cell => {
         renderCell(cell, '.cells-top', 'top-property')
     })
@@ -316,8 +111,13 @@ $(document).ready(() => {
     bottomCells.forEach(cell => {
         renderCell(cell, '.cells-bottom', '')
     })
+    */
 
-    /*
+}
+
+
+const onPageLoad = () => {
+
     $('.modal-content').append(`
         <h2>Welcome</h2>
         <p>Please choose an option to get started:</p>
@@ -336,10 +136,8 @@ $(document).ready(() => {
             renderContinueGame()
         }
     })
-*/
-hideModal()
-})
 
+}
 
 
 const renderNewGame = () => {
@@ -351,22 +149,30 @@ const renderNewGame = () => {
             <label>Number of players:</label>
             <input type="number" id="num_players"/>
         </div>
-        <div class="form-group">
-            <label>Player 1:</label>
-            <input type="text" id="player_one"/>
+        <div class="form-grid">
+            <div>
+                <div class="form-group">
+                    <label>Player 1:</label>
+                    <input type="text" id="player_one"/>
+                </div>
+                <div class="form-group">
+                    <label>Player 2:</label>
+                    <input type="text" id="player_two"/>
+                </div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label>Player 3:</label>
+                    <input type="text" id="player_three"/>
+                </div>
+                <div class="form-group">
+                    <label>Player 4:</label>
+                    <input type="text" id="player_four"/>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Player 2:</label>
-            <input type="text" id="player_two"/>
-        </div>
-        <div class="form-group">
-            <label>Player 3:</label>
-            <input type="text" id="player_three"/>
-        </div>
-        <div class="form-group">
-            <label>Player 4:</label>
-            <input type="text" id="player_four"/>
-        </div>
+        
+        
         <button class="btn btn-primary" id ="start_game_btn"> Create Game! </button>
     `)
     $("#start_game_btn").click(handleNewGame)
@@ -386,6 +192,10 @@ const handleNewGame = () => {
         }
     }).then(res => {
         console.log(res)
+        hideModal()
+        renderPositions(res.state.positions)
+        updateSidebar(res)
+        store.setItem('game', res.game)
     })
 }
 
@@ -414,35 +224,162 @@ const handleContinueGame = () => {
             game_id: $("#game_id").val()
         }
     }).then(res => {
-        console.log(res)
-        hideModal()
-        renderPositions(res.state.positions)
-        updateSidebar(res.state)
+        if(res.success) {
+            hideModal()
+            renderPositions(res.state.positions)
+            updateSidebar(res)
+            store.setItem('game', res.game)
+        } else {
+            $("#continue-game-msg").text("Invalid game id")
+        }
+        
     })
 }
 
 const renderContinueGame = () => {
+    const storedValue = localStorage.getItem("game") || ""
+    
     $('.modal-content').empty()
     $('.modal-content').append(`
         <h2>Resume Game</h2>
         <p>Please game ID you want to resume/join:</p>
         <div>
             <label>Game ID:</label>
-            <input type="number" id="game_id"/>
+            <input type="number" id="game_id" value="${storedValue}"/>
         </div>
+        <p id="continue-game-msg"></p>
         <button class="btn btn-primary" id ="continue_game_btn"> Continue Game </button>
     `)
     $("#continue_game_btn").click(handleContinueGame)
 }
 
 const renderPositions = (positions) => {
+    $(".token").remove()
+
+    Object.values(positions).forEach((p, idx) => {
+        const cellID = p.pos
+        const container = $(`div[data-cell_id=${cellID}] .monopoly-property-tokens`)
+        console.log(cellID)
+        console.log(container)
+        container.append(`
+            <div class="token" style="background-color: ${colors[idx]};"></div>
+        `)
+    })
 
 }
 
-const updateSidebar = (state) => {
-
+const updateSidebar = (res) => {
+    const state = res.state
+    const current_player = state.positions[state.current_player].name
+    $("#game-id").empty()
+    $("#current-player").empty()
+    $("#player-list").empty()
+    $("#game-id").text(res.game)
+    $("#current-player").text(current_player)
+    console.log(state.positions)
+    Object.values(state.positions).forEach((p, idx) => {
+        $("#player-list").append(`<li> 
+            <div class="indicator" 
+                 style="background-color: ${colors[idx]};">${p.scrolls}</div>  
+                 ${p.name}      
+    </li>`)
+    })
 }
 
 const rollDice = () => {
+    $.ajax({
+        method: 'POST',
+        url: '/roll-dice/',
+        data: {
+            game_id: store.getItem('game')
+        }
+    }).then(res => {
+        console.log(res)
+        renderPositions(res.positions)
+        renderDie(res)
+        renderMessage(res.messages)
+        $("#roll-dice-btn").prop("disabled", true)
+        $("#end-turn-btn").prop("disabled", false)
+        
+    })
+}
+
+const endTurn = () => {
+    $.ajax({
+        method: 'POST',
+        url: '/end-turn/',
+        data: {
+            game_id: store.getItem('game')
+        }
+    }).then(res => {
+        console.log(res)
+        updateSidebar(res)
+        $("div.die").empty()
+        // renderPositions(res.state.positions)
+        $("#roll-dice-btn").prop("disabled", false)
+        $("#end-turn-btn").prop("disabled", true)
+    })
+}
+
+const registerEventHandlers = () => {
+    $("#roll-dice-btn").click(rollDice)
+    $("#end-turn-btn").click(endTurn)
+}
+
+const renderDie = (state) => {
+    console.log(state)
+    $("div.die").empty()
+    if(state.dice_one) {
+        $("div.die").append(`
+            <div><img src="${state.dice_one}" alt="dice 1" /></div>
+            <div><img src="${state.dice_two}" alt="dice 2" /></div>
+        `)
+    }
+}
+
+const renderMessage = (payload) => {
+    
+    const render = (data, dismissHandler) => {
+        if(!data) { return }
+        $('.modal-content').empty()
+        if(data.content) {
+            $('.modal-content').append(`
+                <h2 class="text-center">${data.label}</h2>
+                <hr />
+                <p class="txt-md text-center">${data.content}</p
+                <div>
+                    <button class="btn btn-primary" id="modal-dismiss-btn">Dismiss</button>
+                </div>
+            `)
+            $("#modal-dismiss-btn").click(dismissHandler)
+        }
+    
+        if(data.prompt) {
+    
+        }
+        
+        showModal()
+    }
+    if(Array.isArray(payload)) {
+        let idx = 0
+        const onDismiss = () => {
+            idx++
+            console.log(idx)
+            if(idx < payload.length) {
+                render(payload[idx], onDismiss)
+            } else {
+                hideModal()
+            }
+        }
+        render(payload[idx], onDismiss)
+
+    } else {
+        render(payload, hideModal)
+    }
+    
+
+    const onDismiss = () => {
+
+    }
     
 }

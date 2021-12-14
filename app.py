@@ -6,6 +6,8 @@ from db import SessionLocal, engine
 import models 
 import random
 
+from logic import handle_player_move
+
 models.Base.metadata.create_all(bind=engine)
 
 app = Flask(__name__)
@@ -16,9 +18,27 @@ app.session = scoped_session(
     scopefunc=_app_ctx_stack.__ident_func__
 )
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/get-cells/")
+def get_cells():
+    return jsonify({
+        "cells": [
+            {
+                "color": cell.color,
+                "icon": cell.icon,
+                "id": cell.cell_id,
+                "type": cell.cell_type,
+                "label": cell.label,
+                "direction": cell.direction
+            } for cell in app.session.query(models.BoardCell).order_by(models.BoardCell.cell_id).all()
+        ]
+    })
+
 
 @app.route("/new-game/", methods=["POST"])
 def new_game():
@@ -42,7 +62,7 @@ def new_game():
             player = models.Player(
                 name=player_name,
                 game=game.id,
-                position=0,
+                position=1,
                 scrolls=3,
                 get_out_of_jail_cards=0,
                 jail_turns=0,
@@ -59,19 +79,17 @@ def new_game():
         'game': game.id,
         'state': {
             'current_player': game.current_player,
-            'positions': {
-                player.id: (player.name, player.position) \
-                    for player in game.players
-            }
+            'positions': map_player_positions(game.players)
         }
     })
 
+
 @app.route('/end-turn/', methods=["POST"])
 def end_turn():
-    player_id = request.form['player_id']
+    game = app.session.query(models.Game).get(int(request.form['game_id']))
+    player_id = game.current_player
     player = app.session.query(models.Player).get(player_id)
     player.turn_ended = True
-    game = app.session.query(models.Game).get(player.game)
     next_player_index = (game.current_player_index + 1 ) % game.num_players
     game.current_player_index = next_player_index
     next_player = game.players[next_player_index]
@@ -81,11 +99,11 @@ def end_turn():
     
     return jsonify({
         'success': True,
-        'current_player': next_player.id,
-        'positions': {
-            player.id: (player.name, player.position) \
-                for player in game.players
-        }
+        'game': game.id,
+        'state': {
+            'current_player': next_player.id,
+            'positions': map_player_positions(game.players)
+        },
     })
 
 
@@ -103,21 +121,41 @@ def roll_dice():
     one = random.randint(1, 6)
     two = random.randint(1, 6)
     delta = one + two
-    player_id = request.form['player_id']
+    game = app.session.query(models.Game).get(int(request.form['game_id']))
+    player_id = game.current_player
     player = app.session.query(models.Player).get(player_id)
-    player.position = (player.position + delta) % 36
-    app.session.commit()
-    game = app.session.query(models.Game).get(player.game)
-    
-    return jsonify({
-        'success': True,
-        'dice_one': dice_img_url.get(one),
-        'dice_two': dice_img_url.get(one),
-        'positions': {
-            player.id: (player.name, player.position) \
-                for player in game.players
+    pre_player_position = player.position
+    resp = {
+            'success': True,
+            'positions': map_player_positions(game.players)
         }
-    })
+    if player.jail_turns > 0:
+        # TODO handle get out of jail prompt
+        player.jail_turns -= 1
+        app.session.commit()
+        messages = [{
+            'label': 'Jail',
+            'content': f'Player {player.name} spent this turn in jail.'
+                       f'({player.jail_turns} turns left)'
+        }]
+        resp.update({"messages": messages})
+        return jsonify(resp)
+
+    else:
+        player.position = ((player.position + delta) % 36) + 1
+        messages = []
+        while player.position != pre_player_position:
+            pre_player_position = player.position
+            messages.extend(handle_player_move(app.session, player, game))
+            app.session.commit()
+            
+        resp.update({
+            'dice_one': dice_img_url.get(one),
+            'dice_two': dice_img_url.get(two),
+            'positions': map_player_positions(game.players),
+            'messages': messages
+        })
+        return jsonify(resp)
 
 
 @app.route("/continue-game/", methods=["POST"])
@@ -135,12 +173,10 @@ def continue_game():
         'game': game_id,
         'state': {
             'current_player': game.current_player,
-            'positions': {
-                player.id: (player.name, player.position) \
-                    for player in game.players
-            }
+            'positions': map_player_positions(game.players)
         }
     })
+
 
 @socketio.on('my event')
 def handle_my_custom_event(json):
@@ -150,6 +186,14 @@ def handle_my_custom_event(json):
 @app.teardown_appcontext
 def remove_session(*args, **kwargs):
     app.session.remove()
+
+
+def map_player_positions(players):
+    return {
+        player.id: {"name": player.name, "pos": player.position, "scrolls": player.scrolls} \
+            for player in players
+    }
+
 
 if __name__ == '__main__':
     socketio.run(app, '0.0.0.0', 5000, debug=True)

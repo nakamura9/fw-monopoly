@@ -1,16 +1,11 @@
 import random
-
+import models 
+from sqlalchemy import or_
 
 def go_to_jail(player, game, **kwargs):
-    player.position = 9
+    player.position = 28
     print('You have been sent to jail!')
     player.jail_turns = 3
-    if player.get_out_of_jail_free_cards:
-        print('You have a get out of jail free card.')
-        use_card = input("Use get out of jail card(y|n)?")
-        if use_card == "y":
-            player.jail_turns = 0
-            player.get_out_of_jail_free_cards -= 1
 
 def move_x_spaces(player, game, **kwargs):
     player.position = (player.position + kwargs['x']) % len(game.board.cells)
@@ -252,13 +247,16 @@ class Board:
         ('Go to nearest synagogue', move_to_nearest_synagogue),
     ]
     letters_from_governing_body = [
-        ('Go To Jail', go_to_jail),
-        ('Move 3 spaces back', move_x_spaces, {'x': 3}),
-        ('Pay 1 scroll', pay_one_scroll),
-        ('Receive 1 scroll', receive_one_scroll),
+        ('Visit a nearby city on your '
+         'preaching tour, Move 3 spaces back', move_x_spaces, {'x': 3}),
+        ('Support a sister '
+         'congregation nearby, Pay 1 scroll', pay_one_scroll),
+        ('The governing body sends a '
+         'gift, receive 1 scroll', receive_one_scroll),
         ('Receive 1 scroll from each player', receive_one_scroll_from_players),
-        ('Proceed to go', move_to_go),
-        ('Go to property x', move_to_property_x, {'x': 4}),
+        ('You are recalled by the older'
+         ' men to give a report, Proceed to go', move_to_go),
+        ('The governing body instru', move_to_property_x, {'x': 4}),
         ('Go to nearest synagogue', move_to_nearest_synagogue),
     ]
     
@@ -349,7 +347,7 @@ class Player:
             self.scrolls -= 1
             
         elif new_cell['type'] == 'letters':
-            letter_id = board.`current_letter
+            letter_id = board.current_letter
             letter = board.letters_from_governing_body[letter_id]
             print(letter[0])
             kwargs = {} if len(letter) == 2 else letter[2]
@@ -386,6 +384,132 @@ class Player:
         print('End Turn')
         self.game.current_player = (self.game.current_player + 1) % len(self.game.players)
 
+
+def check_win_condition(session, game):
+        for player in game.players:
+            if player.complete_tours == 3:
+                game.game_over = True
+                session.commit()
+                return {
+                    "label": "Game Over",
+                    "content": f"Player {player.name} has won after completing 3 tours"    
+                }
+
+
+def handle_time_card(session, player, game):
+    message = None
+    time_query = session.query(models.BoardCell).filter(
+        models.BoardCell.cell_type == "times"
+    ).all()
+    time_cells = [i.cell_id for i in time_query]
+    if player.position in time_cells:
+        card = Board.time_and_unforeseen_occurences[game.c1]
+        message = {
+            'label': 'Time And Unforeseen Occurences',
+            'content': card[0]
+        }
+        card[1](player, game)
+        session.commit()
+        return message
+
+ 
+def handle_letter_card(session, player, game):
+    message = None
+    letter_query = session.query(models.BoardCell).filter(
+        models.BoardCell.cell_type == "letters"
+    ).all()
+    letter_cells = [i.cell_id for i in letter_query]
+    if player.position in letter_cells:
+        card = Board.letters_from_governing_body[game.c1]
+        message = {
+            'label': 'Letters from the Governing Body',
+            'content': card[0]
+        }
+        card[1](player, game)
+        session.commit()
+        return message
+
+
+def handle_jail_card(session, player, game):
+    if player.position == 28:
+        player.position = 10
+        player.jail_turns = 3
+        return {
+            'label': 'Jail',
+            'content': f'Player {player.name} has been sent to jail!'
+        }
+
+
+def handle_property_card(session, player, game):
+    property_query = session.query(models.BoardCell).filter(
+        or_(
+        models.BoardCell.cell_type == "city", 
+        models.BoardCell.cell_type == "synagogue"
+    )).all()
+    property_cells = [i.cell_id for i in property_query]
+    if player.position in property_cells:
+        owned = session.query(models.OwnedCity).filter(
+            models.OwnedCity.game == game.id,
+            models.OwnedCity.cell_id == player.position
+        ).first()
+        cell = session.query(models.BoardCell).filter(
+            models.BoardCell.cell_id == player.position).first()
+        if owned:
+            # TODO ask trivia
+            owner = session.query(models.Player).get(owned.player)
+            return {
+                "label": "Property",
+                "content": f"Player {player.name} landed on {cell.label} with "
+                           f"a congregation started  by {owner.name}"
+            }
+        else:
+            if player.scrolls > 0:
+                ownership = models.OwnedCity(
+                    game=game.id,
+                    player=player.id,
+                    cell_id=player.position
+                )
+                session.add(ownership)
+                player.scrolls -= 1
+                session.commit()
+                return {
+                    "label": "Property",
+                    "content": f"Player {player.name} landed on {cell.label}. "
+                                "They have spent 1 scroll to start a congregation there."
+                }
+            else:
+                return {
+                    "label": "Property",
+                    "content": f"Player {player.name} landed on {cell.label} "
+                                "but does not have enough scrolls to start a congregation "
+                }
+
+
+def handle_player_move(db, player, game):
+    events = []
+    winner = check_win_condition(db, game)
+    if winner:
+        events.append(winner)
+    time_card = handle_time_card(db, player, game)
+    print(time_card)
+    if time_card:
+        events.append(time_card)
+    letter_card = handle_letter_card(db, player, game)
+    print(letter_card)
+    if letter_card:
+        events.append(letter_card)
+    jail = handle_jail_card(db, player, game)
+    if jail:
+        events.append(jail)
+    property_card = handle_property_card(db, player, game)
+    print('property')
+    print(property_card)
+    if property_card:
+        events.append(property_card)
+    
+    print(events)
+    return events
+    
 
 if __name__ == "__main__":
     game = Game()

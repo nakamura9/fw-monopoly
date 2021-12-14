@@ -7,7 +7,7 @@ from sqlalchemy.orm.session import sessionmaker
 
 
 
-engine = create_engine('sqlite:///game.db', connect_args={
+engine = create_engine('sqlite:///game.sqlite3', connect_args={
     'check_same_thread': False
 })
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
