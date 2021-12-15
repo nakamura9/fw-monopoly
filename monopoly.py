@@ -12,7 +12,8 @@ models.Base.metadata.create_all(bind=engine)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
+# socketio = SocketIO(app)
+
 app.session = scoped_session(
     SessionLocal,
     scopefunc=_app_ctx_stack.__ident_func__
@@ -178,9 +179,9 @@ def continue_game():
     })
 
 
-@socketio.on('my event')
-def handle_my_custom_event(json):
-    print('received json: ' + str(json))
+# @socketio.on('my event')
+# def handle_my_custom_event(json):
+#     print('received json: ' + str(json))
 
 
 @app.teardown_appcontext
@@ -196,7 +197,8 @@ def map_player_positions(players):
 
 
 if __name__ == '__main__':
-    socketio.run(app, '0.0.0.0', 5000, debug=True)
+    # socketio.run(app, '0.0.0.0', 5000, debug=True)
+    app.run('0.0.0.0', 5000, debug=True)
     # app.run()
     # $env:FLASK_APP = "app"   
     # python app.py

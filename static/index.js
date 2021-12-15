@@ -9,10 +9,10 @@ const colors = [
 
 
 $(document).ready(() => {
-    const socket = io()
-    socket.on('connect', () => {
-        socket.emit('my event', {data: 'I am connected'})
-    })
+    // const socket = io()
+    // socket.on('connect', () => {
+    //     socket.emit('my event', {data: 'I am connected'})
+    // })
     
     $(".menu-button").click(showMenu)
     $(".close-menu-button").click(hideMenu)
