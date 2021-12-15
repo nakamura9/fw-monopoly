@@ -190,8 +190,17 @@ def remove_session(*args, **kwargs):
 
 
 def map_player_positions(players):
+    def get_cities(plyr):
+        cities = app.session.query(models.OwnedCity).filter(models.OwnedCity.player == plyr.id).all()
+        return [c.cell_details(app.session) for c in cities]
+        
     return {
-        player.id: {"name": player.name, "pos": player.position, "scrolls": player.scrolls} \
+        player.id: {
+            "name": player.name,
+            "pos": player.position,
+            "scrolls": player.scrolls,
+            "cities": get_cities(player)
+        } \
             for player in players
     }
 

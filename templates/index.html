@@ -1,40 +1,27 @@
 <html>
     <head>
-        <title>Theocratic monopoly</title>
+        <title>First Century monopoly</title>
         <link rel="stylesheet" href="static/style.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css
         ">
+        <link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="static/images/favicon.ico" type="image/x-icon">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
         <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
     </head>
     <body>
-        <div class="menu">
+        <!-- <div class="menu">
             <div class="menu-header">
                 <div class="h4">Game Menu</div>
                 <div class="close-menu-button">
                     <i class="fas fa-angle-left fa-2x    "></i>
                 </div>
             </div>
-            <p>Game # <span id="game-id"></span></p>
-            <h3>Current Player: <span id="current-player"></span></h3>
-            <hr>
-            <h4>Players</h4>
-                <ul id="player-list">
-                    
-                </ul>
-            <hr>
-            <div class="menu-actions">
-                <input type="submit" id="roll-dice-btn" class="btn btn-primary" value="Roll Dice" />
-                <input type="submit" id="end-turn-btn" class="btn btn-primary" value="End Turn" disabled/>
-            </div>
-            <hr>
-            <div class="die">
-                
-            </div>
+            
         </div>
         <div class="menu-button">
             <i class="fas fa-angle-right fa-2x    "></i>
-        </div>
+        </div> -->
         <div>
             <div class="row cells-top" >
             </div>
@@ -43,7 +30,42 @@
                     
                 </div>
                 <div class="center" >
-                    <h1>Theocratic Monopoly</h1>
+                    <div class="center-top">
+                        <div>
+                            <h3>Players</h3>
+                            <hr>
+                            <h4>Current Player: <span id="current-player"></span></h4>
+                                <ul id="player-list">
+                                    
+                                </ul>
+                        </div>
+                        <div>
+                            
+                            <div class="menu-actions">
+                                <input type="submit" id="roll-dice-btn" class="btn btn-primary" value="Roll Dice" />
+                                <input type="submit" id="end-turn-btn" class="btn btn-primary" value="End Turn" disabled/>
+                            </div>
+                            <hr>
+                            <div class="die">
+                                
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="center-middle">
+                        <div>
+                            <img src="static/images/open-book.png" alt="" srcset="">
+                            <h1>First Century Monopoly</h1>
+                            <p class="text-center">Game # <span id="game-id"></span></p>
+                        </div>
+                    </div>
+                    <div class="center-bottom">
+                        
+                        <div id="player-properties">
+                            
+
+                        </div>
+                    </div>
                 </div>
                 <div class="column cells-right">
                 </div>
@@ -59,5 +81,6 @@
         </div>
     </div>
     <script src="static/index.js"></script>
+    <div style="display:none;">Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
     </body>
 </html>

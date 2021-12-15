@@ -57,8 +57,32 @@ div.row {
     min-width: 992px;
     width: 992px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    font-family: sans-serif;
+}
+
+.center-top, .center-bottom {
+    flex: 1
+}
+
+.center-top {
+    display: flex;
+    justify-content: space-around;
+}
+
+.center-top > div {
+    width: 250px;
+}
+
+.center-middle {
+    flex: 2;
+    display: flex;
     justify-content: center;
+}
+
+.center-middle img {
+    height: 300px;
+    width: auto;
 }
 
 
@@ -101,6 +125,7 @@ div.row {
 .close-menu-button:hover {
     background-color: #ccc;
 }
+
 
 .menu-button {
     z-index: 10;
@@ -174,9 +199,11 @@ div.row {
 }
 
 .menu-actions {
+    margin-top: 3rem;
     display: flex;
     justify-content: space-around;
 }
+
 
 .token {
     width: 35px;
@@ -208,10 +235,19 @@ div.row {
 }
 
 .indicator {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     display: inline-block;
     border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+ul#player-list > li {
+    display: flex;
+    justify-content: space-between;
 }
 
 .indicator.active {
@@ -249,4 +285,33 @@ input[type="submit"].btn:disabled {
 input[type="submit"].btn:disabled:hover {
     transform: none;
     
+}
+
+.cell-icon {
+    opacity: 0.3;
+}
+
+#player-properties {
+    display: flex;
+    padding: 0px 0.5rem;
+}
+
+#player-properties > div {
+    flex: 1;
+}
+
+.mini-property {
+    width: 40px;
+    height: 60px;
+    border: 1px solid black;
+    border-radius: 2px;
+    font-size: .75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-property-heading {
+    height: 20px;
+    border-bottom: 1px solid black;
 }

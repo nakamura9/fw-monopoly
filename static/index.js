@@ -47,7 +47,9 @@ const renderBoard = () => {
                 <div class="monopoly-property ${orientation}" data-cell_id=${cell.id}>
                     <div>
                         <h4 class='monopoly-property-name'>${cell.label}</h4>
-                        <div class="monopoly-property-tokens"></div>
+                        <div class="monopoly-property-tokens">
+                            <i class="fas fa-scroll fa-2x cell-icon"></i>
+                        </div>
                     </div>
                 </div>
             `
@@ -56,16 +58,31 @@ const renderBoard = () => {
             const cornerContent = `
                 <div class="corner-square" data-cell_id=${cell.id}>
                     <h2>${cell.label}</h2>
-                    <div class="monopoly-property-tokens"></div>
+                    <div class="monopoly-property-tokens"> 
+                    </div>
                 </div>
             `
             prepend ? $(container).prepend(cornerContent) : $(container).append(cornerContent)
         } else if (["letters", 'times', 'taxes'].includes(cell.type )) {
+            let icon
+            switch(cell.type) {
+                case "letters":
+                    icon = "fas fa-feather"
+                    break;
+                case "times":
+                    icon = "fas fa-exclamation-triangle"
+                    break;
+                case "taxes":
+                    icon = "fas fa-coins"
+                    break;
+            }
             const otherContent = `
                 <div class="monopoly-property ${orientation}" data-cell_id=${cell.id}>
                     <div>
                         <h4 class='monopoly-property-name'>${cell.label}</h4>
-                        <div class="monopoly-property-tokens"></div>
+                        <div class="monopoly-property-tokens">
+                            <i class="${icon} fa-2x cell-icon"></i>
+                        </div>
                     </div>
                 </div>
             `
@@ -283,6 +300,15 @@ const updateSidebar = (res) => {
                  style="background-color: ${colors[idx]};">${p.scrolls}</div>  
                  ${p.name}      
     </li>`)
+        $("#player-properties").append(`
+            <div>
+                <h4>${p.name}</h4>
+                <hr>
+                <div>
+                    ${p.cities.map(c => `<div class="mini-property"><div class="mini-property-heading" style="background-color: ${c.color};"></div><span>${c.label}</span></div>`).join("")}
+                </div>
+            </div>
+        `)
     })
 }
 

@@ -52,6 +52,13 @@ class OwnedCity(Base):
     player = Column(Integer, ForeignKey("player.id"))
     cell_id = Column(Integer)
 
+    
+    def cell_details(self, session):
+        cell = session.query(BoardCell).get(self.cell_id)
+        return {
+            "color": cell.color,
+            "label": cell.label
+        }
 
 class QuizQuestion(Base):
     __tablename__ = "question"
