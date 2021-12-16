@@ -31,6 +31,15 @@ class Player(Base):
     complete_tours = Column(Integer)
     turn_ended = Column(Boolean, default=False)
 
+    def owned_cities(self, session):
+        return session.query(OwnedCity).filter(OwnedCity.player == self.id).all()
+
+    def cells(self, session):
+        cities = self.owned_cities(session)
+        return [
+            session.query(BoardCell).filter(BoardCell.cell_id == c.cell_id).first()
+                for c in cities
+        ]
   
 class BoardCell(Base):
     __tablename__ = "board_cell"
@@ -54,7 +63,7 @@ class OwnedCity(Base):
 
     
     def cell_details(self, session):
-        cell = session.query(BoardCell).get(self.cell_id)
+        cell = session.query(BoardCell).filter(BoardCell.cell_id == self.cell_id).first()
         return {
             "color": cell.color,
             "label": cell.label

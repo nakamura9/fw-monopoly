@@ -2,6 +2,14 @@
     width: 120px;
     height: 150px;
     border: 2px solid black;
+    position: relative;
+}
+
+.monopoly-property i {
+    position: absolute;
+    bottom: 20px;
+    left: 39px;
+    z-index: -1;
 }
 
 .monopoly-property-header {
@@ -83,6 +91,8 @@ div.row {
 .center-middle img {
     height: 300px;
     width: auto;
+    display: block;
+    margin: 0px auto;
 }
 
 
@@ -189,7 +199,8 @@ div.row {
     margin-top: 0.5rem;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     border: 1px solid #ccc;
     border-radius: 0.25rem;;
     outline: none;
@@ -309,9 +320,24 @@ input[type="submit"].btn:disabled:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-left: 8px;
+    margin-top: 8px;
 }
 
 .mini-property-heading {
     height: 20px;
     border-bottom: 1px solid black;
+}
+
+.player-property-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+a.btn {
+    text-decoration: none;
+    display: inline-block;
+    padding: 0.5rem;
+    font-weight: 700;
+    color: steelblue
 }

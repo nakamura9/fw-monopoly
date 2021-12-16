@@ -4,7 +4,6 @@ from sqlalchemy import or_
 
 def go_to_jail(player, game, **kwargs):
     player.position = 28
-    print('You have been sent to jail!')
     player.jail_turns = 3
 
 def move_x_spaces(player, game, **kwargs):
@@ -237,14 +236,14 @@ class Board:
         },
     ]
     time_and_unforeseen_occurences = [
-        ('Go To Jail', go_to_jail),
-        ('Move 3 spaces back', move_x_spaces, {'x': 3}),
-        ('Pay 1 scroll', pay_one_scroll),
-        ('Receive 1 scroll', receive_one_scroll),
-        ('Receive 1 scroll from each player', receive_one_scroll_from_players),
-        ('Proceed to go', move_to_go),
-        ('Go to property x', move_to_property_x, {'x': 4}),
-        ('Go to nearest synagogue', move_to_nearest_synagogue),
+        ('The Jews have followed you and instigated a riot. Go To Jail', go_to_jail),
+        ('Apostates have tried to subvert your teaching. Move 3 spaces back', move_x_spaces, {'x': 3}),
+        ('The emperor has commanded all Romans citizens pay a tax. Pay 1 scroll.', pay_one_scroll),
+        ('An unexpected gift from Jerusalem. Receive 1 scroll', receive_one_scroll),
+        ('The friends have resolved to share their scrolls with you.Receive 1 scroll from each player', receive_one_scroll_from_players),
+        ('Favourable winds have taken you back to your home base in record time. Proceed to go', move_to_go),
+        ('An unexpected journey. Go to city x', move_to_property_x, {'x': 4}),
+        ('You have been compelled to refute false teachings among the Jews. Go to nearest synagogue', move_to_nearest_synagogue),
     ]
     letters_from_governing_body = [
         ('Visit a nearby city on your '
@@ -253,11 +252,11 @@ class Board:
          'congregation nearby, Pay 1 scroll', pay_one_scroll),
         ('The governing body sends a '
          'gift, receive 1 scroll', receive_one_scroll),
-        ('Receive 1 scroll from each player', receive_one_scroll_from_players),
+        ('The elders in Jerusalem and concerned that you may be running low on provisions. Receive 1 scroll from each player', receive_one_scroll_from_players),
         ('You are recalled by the older'
          ' men to give a report, Proceed to go', move_to_go),
-        ('The governing body instru', move_to_property_x, {'x': 4}),
-        ('Go to nearest synagogue', move_to_nearest_synagogue),
+        ('The governing body instructs you to visit a specific city.', move_to_property_x, {'x': 4}),
+        ('Go to nearest synagogue and reason on the scriptures.', move_to_nearest_synagogue),
     ]
     
     def __init__(self):
@@ -386,17 +385,25 @@ class Player:
 
 
 def check_win_condition(session, game):
+        winning = (None, 0)
+        
         for player in game.players:
+            cities_owned = len(player.owned_cities(session))
+            if cities_owned > winning[1]:
+                winning = (player, cities_owned)
+
             if player.complete_tours == 3:
                 game.game_over = True
                 session.commit()
-                return {
-                    "label": "Game Over",
-                    "content": f"Player {player.name} has won after completing 3 tours"    
-                }
+        
+        if game.game_over:
+            return {
+                "label": "Game Over",
+                "content": f"Player {winning[0].name} has won after 3 tours with the most congregations started."    
+            }
 
 
-def handle_time_card(session, player, game):
+def handle_time_card_and_taxes(session, player, game):
     message = None
     time_query = session.query(models.BoardCell).filter(
         models.BoardCell.cell_type == "times"
@@ -404,6 +411,7 @@ def handle_time_card(session, player, game):
     time_cells = [i.cell_id for i in time_query]
     if player.position in time_cells:
         card = Board.time_and_unforeseen_occurences[game.c1]
+        game.c1 = (game.c1 + 1 ) % 8
         message = {
             'label': 'Time And Unforeseen Occurences',
             'content': card[0]
@@ -411,7 +419,16 @@ def handle_time_card(session, player, game):
         card[1](player, game)
         session.commit()
         return message
-
+    
+    # the one scroll tax
+    if player.position == 33:
+        player.scrolls -= 1
+        session.commit()
+        return {
+            "label": "Tax",
+            "content": f"{player.name} has landed on taxes. They have to pay 1 scroll."    
+        }
+ 
  
 def handle_letter_card(session, player, game):
     message = None
@@ -420,7 +437,8 @@ def handle_letter_card(session, player, game):
     ).all()
     letter_cells = [i.cell_id for i in letter_query]
     if player.position in letter_cells:
-        card = Board.letters_from_governing_body[game.c1]
+        card = Board.letters_from_governing_body[game.c2]
+        game.c2 = (game.c2 + 1 ) % 8
         message = {
             'label': 'Letters from the Governing Body',
             'content': card[0]
@@ -430,7 +448,7 @@ def handle_letter_card(session, player, game):
         return message
 
 
-def handle_jail_card(session, player, game):
+def handle_jail_events(session, player, game):
     if player.position == 28:
         player.position = 10
         player.jail_turns = 3
@@ -438,6 +456,17 @@ def handle_jail_card(session, player, game):
             'label': 'Jail',
             'content': f'Player {player.name} has been sent to jail!'
         }
+        
+    if player.scrolls < 0:
+        player.scrolls = 0
+        player.position = 10
+        player.jail_turns = 3
+        
+        return {
+            'label': 'Jail',
+            'content': f'Player {player.name} cannot pay taxes. They have been sent to jail!'
+        }
+            
 
 
 def handle_property_card(session, player, game):
@@ -457,10 +486,15 @@ def handle_property_card(session, player, game):
         if owned:
             # TODO ask trivia
             owner = session.query(models.Player).get(owned.player)
+            questions = session.query(models.QuizQuestion).all()
+            question = random.choice(questions)
             return {
                 "label": "Property",
                 "content": f"Player {player.name} landed on {cell.label} with "
-                           f"a congregation started  by {owner.name}"
+                           f"a congregation started  by {owner.name}",
+                "question":  question.question,
+                "question_id": question.id,
+                "answers": [question.option_1, question.option_2, question.option_3]
             }
         else:
             if player.scrolls > 0:
@@ -483,6 +517,20 @@ def handle_property_card(session, player, game):
                     "content": f"Player {player.name} landed on {cell.label} "
                                 "but does not have enough scrolls to start a congregation "
                 }
+                
+
+def handle_visiting_jail_or_inn(session, player, game):
+    if player.position == 19:
+        return {
+            "label": "Visiting The Inn",
+            "content": "Take some time to rest up a bit"
+        }
+        
+    if player.position == 10 and player.jail_turns == 0:
+        return {
+            "label": "Visiting Jail",
+            "content": "Taking some time to visit those imprisoned for the good news."
+        }
 
 
 def handle_player_move(db, player, game):
@@ -490,24 +538,23 @@ def handle_player_move(db, player, game):
     winner = check_win_condition(db, game)
     if winner:
         events.append(winner)
-    time_card = handle_time_card(db, player, game)
-    print(time_card)
+    time_card = handle_time_card_and_taxes(db, player, game)
     if time_card:
         events.append(time_card)
     letter_card = handle_letter_card(db, player, game)
-    print(letter_card)
     if letter_card:
         events.append(letter_card)
-    jail = handle_jail_card(db, player, game)
+    jail = handle_jail_events(db, player, game)
     if jail:
         events.append(jail)
     property_card = handle_property_card(db, player, game)
-    print('property')
-    print(property_card)
     if property_card:
         events.append(property_card)
     
-    print(events)
+    inn_or_jail = handle_visiting_jail_or_inn(db, player, game)
+    if inn_or_jail:
+        events.append(inn_or_jail)
+    
     return events
     
 

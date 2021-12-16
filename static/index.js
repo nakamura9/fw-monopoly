@@ -3,7 +3,7 @@ const store = window.localStorage
 const colors = [
     "crimson",
     "limegreen",
-    "steelblue",
+    "#7D0552",
     "#007bff"
 ]
 
@@ -14,15 +14,15 @@ $(document).ready(() => {
     //     socket.emit('my event', {data: 'I am connected'})
     // })
     
-    $(".menu-button").click(showMenu)
-    $(".close-menu-button").click(hideMenu)
+    // $(".menu-button").click(showMenu)
+    // $(".close-menu-button").click(hideMenu)
 
     renderBoard()
     onPageLoad()
     registerEventHandlers()
     // renderMessage([
     //     {label: "Caleb Is great", content:"Fo sho"},
-    //     {label: "Conrad Is lame", content:"Mzanzi"},
+    //     {label: "Conrad Is lame", content:"Mzanzi", "question": " Is Caleb Great", "question_id": 1, "answers": ["Yes", "No", "Maybe"]},
     // ])
 })
 
@@ -143,6 +143,7 @@ const onPageLoad = () => {
             <li><input type="radio" name="game_type" value="new" /> Start a new game</li>
         </ul> 
         <button class="btn btn-primary" id ="select_btn"> Go! </button>
+        <p>If you would like to learn how to play, visit the <a class="btn" href="/rules/"> Rules page.</a></p>
     `)
 
     $("#select_btn").click(() => {
@@ -305,7 +306,7 @@ const updateSidebar = (res) => {
             <div>
                 <h4>${p.name}</h4>
                 <hr>
-                <div>
+                <div class="player-property-list">
                     ${p.cities.map(c => `<div class="mini-property"><div class="mini-property-heading" style="background-color: ${c.color};"></div><span>${c.label}</span></div>`).join("")}
                 </div>
             </div>
@@ -369,22 +370,35 @@ const renderMessage = (payload) => {
     const render = (data, dismissHandler) => {
         if(!data) { return }
         $('.modal-content').empty()
-        if(data.content) {
+        $('.modal-content').append(`
+            <h2 class="text-center">${data.label}</h2>
+            <hr />
+            <p class="txt-md text-center">${data.content}</p
+            
+        `)
+    
+        if(data.question) {
             $('.modal-content').append(`
-                <h2 class="text-center">${data.label}</h2>
-                <hr />
-                <p class="txt-md text-center">${data.content}</p
+                <div>
+                    <p>${data.question}</p>
+                    <div class="form-group">
+                        <select id="question_choice">
+                            ${data.answers.map((ans, idx) => `<option value="${idx + 1}">${ans}</option>`).join("")}
+                        </select>
+                    </div>
+                    <input type="hidden" name="question_id" id="id_question_id" value="${data.question_id}" />
+                    <button class="btn btn-primary" id="answer-question">Submit Answer</button>
+                </div>
+            `)
+            $("#answer-question").click(submitQuestionHandler)
+        } else {
+            $('.modal-content').append(`
                 <div>
                     <button class="btn btn-primary" id="modal-dismiss-btn">Dismiss</button>
                 </div>
             `)
             $("#modal-dismiss-btn").click(dismissHandler)
         }
-    
-        if(data.prompt) {
-    
-        }
-        
         showModal()
     }
     if(Array.isArray(payload)) {
@@ -409,4 +423,18 @@ const renderMessage = (payload) => {
 
     }
     
+}
+
+const submitQuestionHandler = () => {
+    $.ajax({
+        method: "POST",
+        url: "/answer-question/",
+        data: {
+            question_id: $('#id_question_id').val(),
+            answer: $('#question_choice').val(),
+            game_id: store.getItem('game') 
+        }
+    }).then(res => {
+        renderMessage(res)
+    })
 }

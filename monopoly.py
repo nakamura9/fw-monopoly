@@ -1,4 +1,4 @@
-from flask import Flask, _app_ctx_stack, json, jsonify, request
+from flask import Flask, _app_ctx_stack, json, jsonify, request, redirect
 from flask import render_template
 from sqlalchemy.orm import scoped_session
 from flask_socketio import SocketIO
@@ -24,6 +24,28 @@ app.session = scoped_session(
 def index():
     return render_template("index.html")
 
+
+@app.route("/rules/")
+def rules():
+    return render_template("rules.html")
+
+@app.route("/add-questions/", methods=["GET", "POST"])
+def add_questions():
+    if request.method == "GET":
+        return render_template("add_question.html")
+    else:
+
+        question = models.QuizQuestion(
+            question=request.form['question'],
+            option_1=request.form['option_1'],
+            option_2=request.form['option_2'],
+            option_3=request.form['option_3'],
+            answer=int(request.form['answer']),
+        )
+        
+        app.session.add(question)
+        app.session.commit()
+        return redirect("/add-questions/", code=302)
 
 @app.route("/get-cells/")
 def get_cells():
@@ -143,8 +165,17 @@ def roll_dice():
         return jsonify(resp)
 
     else:
-        player.position = ((player.position + delta) % 36) + 1
+        # check if passing go
         messages = []
+        if player.position + delta >= 36:
+            messages.append({
+                'label': 'Passed Go!',
+                'content': 'For passing through your home base, you receive a new scroll.'
+            })
+            player.scrolls += 1
+            player.complete_tours += 1
+        player.position = ((player.position + delta) % 36) + 1
+        
         while player.position != pre_player_position:
             pre_player_position = player.position
             messages.extend(handle_player_move(app.session, player, game))
@@ -203,6 +234,26 @@ def map_player_positions(players):
         } \
             for player in players
     }
+    
+@app.route("/answer-question/", methods=["POST"])
+def answer_question():
+    question = app.session.query(models.QuizQuestion).get(request.form['question_id'])
+    game = app.session.query(models.Game).get(request.form['game_id'])
+    player = app.session.query(models.Player).get(game.current_player)
+    
+    if question.answer == int(request.form['answer']):
+        player.scrolls += 1
+        app.session.commit()
+        return {
+            "label": "Correct!",
+            "content": f"The question was answered correctly, {player.name} has received 1 scroll"
+        }
+        
+    else:
+        return {
+            "label": f"Sorry {player.name}!",
+            "content": "The question was answered incorrectly."
+        }
 
 
 if __name__ == '__main__':
