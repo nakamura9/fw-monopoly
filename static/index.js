@@ -291,6 +291,7 @@ const updateSidebar = (res) => {
     $("#game-id").empty()
     $("#current-player").empty()
     $("#player-list").empty()
+    $("#player-properties").empty()
     $("#game-id").text(res.game)
     $("#current-player").text(current_player)
     console.log(state.positions)
